@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# This script creates the contents, file-list, updates and CHANGELOG files for
+# the package tree in the current directory. It takes a few minutes to run.
+
+# Gather data from user
+echo "Enter the version number use in the CHANGELOG: "
+read version
+
+# Create file-list
+find . -name "*.txz" > file-list
+
+# Create CHANGELOG and updates
+echo $(date -u) >> CHANGELOG
+echo Initial build of Cucumber Linux $version >> CHANGELOG
+while read -u 3 line; do
+	file=$(echo $line | cut -d / -f 2-)
+	echo "update	$file" >> updates
+	echo "$file built" >> CHANGELOG
+done 3< file-list
+echo "+----------------+" >> CHANGELOG
+echo $(date -u) >> CHANGELOG
+cat >> CHANGELOG << EOF
+***** Cucumber Linux $version Released *****
+Version $version of Cucumber Linux has been released.
++----------------+
+EOF
+
+# Build the Contents
+$(dirname $0)/rebuild_contents
+
