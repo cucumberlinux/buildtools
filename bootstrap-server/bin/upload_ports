@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# This script uploads the ports directory (/usr/ports) to the staging server.
+
+# Load the config file
+source $(dirname $0)/config
+
+# Upload the packages tree
+echo rsync -e ssh -av /usr/ports $STAGING_SERVER/cucumber/cucumber-$CUCUMBER_VERSION/
+rsync -e ssh -av /usr/ports $STAGING_SERVER/cucumber/cucumber-$CUCUMBER_VERSION/
+
