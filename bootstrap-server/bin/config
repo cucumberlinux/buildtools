@@ -1,0 +1,12 @@
+# The version of Cucumber Linux that this server builds for. Only the part of
+# tree for this version will be synced with the primary mirrors.
+CUCUMBER_VERSION=%VERSION%
+
+# The server to use as the staging server. This must include the user, host and
+# base directory in the rsync over ssh format:
+# user@staging-server.example.com:/home/user/
+# Note that /home/user MUST be the base directory for the cucumber tree (the
+# directory that contains the cucumber, cucumber_release, old_packages and
+# templates directories) on the remote server.
+STAGING_SERVER=user@staging-server.example.com:/home/user/
+

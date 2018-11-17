@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# This script completely rebuilds the contents in the current directory from
+# scratch. It takes a few minutes to run
+
+# Update the package contents file
+if [ -e contents ]; then
+	rm contents
+fi
+for package in $(find . -name "*.txz"); do
+	pkg_name="$(echo $package | rev | cut -d . -f 2- | rev | cut -d / -f 2-)"
+	for line in $(tar -tf $package); do
+		echo "$pkg_name	/$line" >> contents
+	done
+done
+if [ -e contents.bz2 ]; then
+	rm contents.bz2
+fi
+bzip2 contents
