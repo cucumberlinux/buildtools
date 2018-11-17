@@ -1,7 +1,7 @@
 # Sets the base directory for the cucumber supertree. This should be the
 # directory that contains the cucumber, cucumber_release, old_packages and
 # templates directories.
-BASEDIR=/home/user
+BASEDIR=%HOMEDIR%
 
 # The version of Cucumber Linux that this server builds for. Only the part of
 # tree for this version will be synced with the primary mirrors.
