@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# This script updates the file-list and updates file in the current directory 
+# to reflect any changes to the tree.
+#
+# It also updates the contents file.
+
+add_package() {
+	echo "Enter a reason for adding $pkg (new|update|install|new/up):"
+	read reason
+	echo "$reason	$1" >> updates
+
+	# Add it to the contents
+	pkg_name="$(echo $pkg | rev | cut -d . -f 2- | rev | cut -d / -f 1-)"
+	for line in $(tar -tf $pkg); do
+		echo "$pkg_name	/$line" >> contents
+	done
+}
+
+remove_package() {
+	echo "Enter a reason for removing $pkg (removed):"
+	read reason
+	echo "$reason	$1" >> updates
+
+	# Remove it from the contents
+	pkg_name="$(echo $pkg | rev | cut -d . -f 2- | rev | cut -d / -f 2-)"
+	grep -v "$pkg_name	/" contents > contents2
+	mv contents2 contents
+}
+
+bunzip2 contents.bz2 
+
+find . -name "*.txz" > file-list.new
+sed -i file-list.new -e 's|\./||g'
+diff file-list file-list.new > updated_packages
+
+while read -u 3 line; do
+	action=$(echo $line | awk '{ print $1 }')
+	pkg=$(echo $line | awk '{ print $2 }')
+	[ -z "$pkg" ] && continue
+	case $action in
+	'>')
+		add_package $pkg
+		;;
+	'<')
+		remove_package $pkg
+		;;
+	esac
+done 3< updated_packages
+
+mv file-list.new file-list
+rm updated_packages
+
+# Rezip the contents
+bzip2 contents
+
+exit

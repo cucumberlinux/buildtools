@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# This script adds an entry to a changelog file.
+
+if [ $# -lt 1 ]; then
+	echo "Usage: $0 <logfile>"
+	exit 1
+fi
+
+logfile=$1
+
+echo $(date -u) >> $logfile
+
+cat /dev/stdin >> $logfile
+
+echo "+----------------+" >> $logfile
+
