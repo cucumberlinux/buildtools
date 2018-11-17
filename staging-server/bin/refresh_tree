@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# This script runs the refresh_lists script for all of the individual
+# architecture trees.
+
+# Load the config
+source $(dirname $0)/config
+
+dirname=$(dirname $0)
+
+if [ $# -lt 1 ]; then
+	echo "Usage: $0 <cucumber_branch>"
+	exit 1
+fi
+
+while read -u4 arch; do
+	echo "Refreshing $1-$arch"
+	(
+		cd $BASEDIR/cucumber/cucumber-$1/cucumber-$arch
+		$dirname/refresh_lists
+	)
+done 4< $ARCHS_FILE

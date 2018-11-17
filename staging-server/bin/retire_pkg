@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# This script retires a package by moving it out of the main tree and into the
+# old_packages tree.
+
+# Load the config
+source $(dirname $0)/config
+
+if [ $# -lt 3 ]; then
+	echo "Usage: $0 <cucumber_branch> <package_group> <full_package_name>"
+	exit 1
+fi
+
+echo "Retiring package $2/$3."
+
+while read arch; do
+	# Retire the package
+	if [ ! -e $BASEDIR/old_packages/cucumber-$1/cucumber-$arch/$2/ ]; then
+		mkdir -pv $BASEDIR/old_packages/cucumber-$1/cucumber-$arch/$2/
+	fi
+	mv -v $BASEDIR/cucumber/cucumber-$1/cucumber-$arch/$2/$3* $BASEDIR/old_packages/cucumber-$1/cucumber-$arch/$2/
+
+	# Retire the multilib compatibility package
+	if [ ! -e $BASEDIR/cucumber/cucumber-$1/cucumber-$arch/multilib/$2/$3* ]; then
+		continue
+	elif [ ! -e $BASEDIR/old_packages/cucumber-$1/cucumber-$arch/multilib/$2/ ]; then
+		mkdir -pv $BASEDIR/old_packages/cucumber-$1/cucumber-$arch/multilib/$2/
+	fi
+	mv -v $BASEDIR/cucumber/cucumber-$1/cucumber-$arch/multilib/$2/$3* $BASEDIR/old_packages/cucumber-$1/cucumber-$arch/multilib/$2/
+done < $ARCHS_FILE
+
+echo "Done retiring package $3."
+

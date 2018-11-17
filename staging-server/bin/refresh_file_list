@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This script updates the file-list and updates file in the current directory 
+# to reflect any changes to the tree.
+
+# WARNING: THIS SCRIPT DOES NOT UPDATE THE CONTENTS. IT ALSO BREAKS THE
+# INCREMENTAL UPDATING OF THE refresh_lists SCRIPT. IF YOU USE THIS SCRIPT, YOU
+# WILL NEED TO RUN rebuild_contents TO FIX THE CONTENTS FILE.
+
+add_package() {
+	echo "Enter a reason for adding $pkg (new|update|new/up):"
+	read reason
+	echo "$reason	$1" >> updates
+}
+
+remove_package() {
+	echo "Enter a reason for removing $pkg (removed):"
+	read reason
+	echo "$reason	$1" >> updates
+}
+
+find . -name "*.txz" > file-list.new
+sed -i file-list.new -e 's|\./||g'
+diff file-list file-list.new > updated_packages
+
+while read -u 3 line; do
+	action=$(echo $line | awk '{ print $1 }')
+	pkg=$(echo $line | awk '{ print $2 }')
+	[ -z "$pkg" ] && continue
+	case $action in
+	'>')
+		add_package $pkg
+		;;
+	'<')
+		remove_package $pkg
+		;;
+	esac
+done 3< updated_packages
+
+mv file-list.new file-list
+rm updated_packages
+
+exit

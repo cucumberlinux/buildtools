@@ -1,0 +1,17 @@
+# Sets the base directory for the cucumber supertree. This should be the
+# directory that contains the cucumber, cucumber_release, old_packages and
+# templates directories.
+BASEDIR=%HOMEDIR%
+
+# The version of Cucumber Linux that this server builds for. Only the part of
+# tree for this version will be synced with the primary mirrors.
+CUCUMBER_VERSION=%VERSION%
+
+# Specifies the path of the file containing a list of architectures. Each arch
+# should be on a separate line and be entered in the file exacly as it appears
+# in the main tree.
+ARCHS_FILE=$BASEDIR/archs
+
+# Specifies the file containing the primary mirrors to push to. The file has
+# one mirror per line, and each mirror is an rsync over ssh address.
+MIRRORS_FILE=$BASEDIR/mirrors

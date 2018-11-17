@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# This script finds all unsigned packages in the cucumber tree (excluding the
+# installer directory).
+
+# Load the config
+source $(dirname $0)/config
+
+for pkg in $(find $BASEDIR/cucumber/ -name '*.txz'); do
+	if [ ! -e $pkg.asc ]; then
+		echo $pkg | grep -v '/installer/'
+	fi
+done
