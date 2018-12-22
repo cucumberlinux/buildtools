@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# This script creates the initial directories and files under the basedir.
+
+# Load the config
+source $(dirname $0)/config
+
+# Create the directory skeleton
+mkdir -pv $BASEDIR/cucumber/cucumber-$CUCUMBER_VERSION/{cucumber-i686,cucumber-x86_64,ports,ISOs} || exit 1
+mkdir -pv $BASEDIR/old_packages/cucumber-$CUCUMBER_VERSION/{cucumber-i686,cucumber-x86_64} || exit 1
+mkdir -pv $BASEDIR/cucumber_releases || exit 1
+
+# Create a compatibility symlink
+ln -sf ports/cucumber $BASEDIR/cucumber/cucumber-$CUCUMBER_VERSION/source || exit 1
+
+# Clone the installer git repository
+cd $BASEDIR/cucumber/cucumber-$CUCUMBER_VERSION || exit 1
+if [ ! -e installer ]; then
+	git clone https://github.com/cucumberlinux/installer || exit 1
+else
+	cd installer && git pull || exit 1
+fi
+
