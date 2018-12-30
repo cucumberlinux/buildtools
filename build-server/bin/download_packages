@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# This script downloads the packages directory (/opt/packages/cucumber) from the
+# staging server.
+
+# Load the config file
+source $(dirname $0)/config
+
+# Determine the architecture we are building on if it is not explicitly
+# specified
+if [ -z "$CUCARCH" ]; then
+	case "$(uname -m)" in
+	# For the x86 series, force i686
+	i?86)
+		export CUCARCH="i686"
+		;;
+	x86_64)
+		export CUCARCH="x86_64"
+		;;
+	# Use "uname -m" for all other architectures
+	*)
+		export CUCARCH=$(uname -m)
+	esac
+fi
+
+# Create the directory to place the packages in
+mkdir -pv /opt/packages/cucumber
+
+# Download the packages tree
+echo rsync -e ssh -av $STAGING_SERVER/cucumber/cucumber-$CUCUMBER_VERSION/cucumber-$CUCARCH/* /opt/packages/cucumber/
+rsync -e ssh -av $STAGING_SERVER/cucumber/cucumber-$CUCUMBER_VERSION/cucumber-$CUCARCH/* /opt/packages/cucumber/
+

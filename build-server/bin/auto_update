@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# This script automatically updates the packages for Cucumber Linux. It does
+# the following:
+#
+#   1. Update the local copy of the ports tree.
+#   2. Update the local packages directory (in /opt/packages/cucumber).
+#   3. Build any updated packages.
+#   4. Upload the packages in /opt/packages and the old packages to the
+#      staging server.
+
+# Update the local copy of the ports tree. We use rsync here to ensure that the
+# modification times are correct (git does not preserve this). Additionally,
+# rsync copies the source over from the staging server, so we can save some
+# bandwidth if we have multiple buildservers on the same network.
+portsync -r || exit 1
+
+# Upload the local packages directory to ensure we do not accidentally delete a
+# package due to our package directory being out of sync.
+$(dirname $0)/download_packages || exit 1
+
+# Build any updated packages.
+portmake update-all || exit 1
+
+# Upload the packages to the staging server.
+$(dirname $0)/upload_packages || exit 1
+
