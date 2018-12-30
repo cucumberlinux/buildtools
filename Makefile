@@ -27,3 +27,8 @@ install-bootstrap-server: install-common
 	$(SED) -i $(DESTDIR)/config -e "s@%HOMEDIR%@$(HOMEDIR)@g"
 	$(SED) -i $(DESTDIR)/config -e "s@%VERSION%@$(VERSION)@g"
 
+install-build-server: install-common
+	$(CP) build-server/bin/* $(DESTDIR)/
+	$(SED) -i $(DESTDIR)/config -e "s@%HOMEDIR%@$(HOMEDIR)@g"
+	$(SED) -i $(DESTDIR)/config -e "s@%VERSION%@$(VERSION)@g"
+
