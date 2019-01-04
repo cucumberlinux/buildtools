@@ -25,3 +25,6 @@ portmake update-all || exit 1
 # Upload the packages to the staging server.
 $(dirname $0)/upload_packages || exit 1
 
+# Upload the old_packages to the staging server.
+$(dirname $0)/upload_old_packages || exit 1
+
