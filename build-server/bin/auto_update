@@ -18,6 +18,7 @@ portsync -r || exit 1
 # Upload the local packages directory to ensure we do not accidentally delete a
 # package due to our package directory being out of sync.
 $(dirname $0)/download_packages || exit 1
+$(dirname $0)/download_old_packages || exit 1
 
 # Build any updated packages.
 portmake update-all || exit 1
