@@ -24,6 +24,6 @@ if [ -z "$CUCARCH" ]; then
 fi
 
 # Upload the packages tree
-echo rsync -e ssh -av /opt/old_packages/cucumber/* $STAGING_SERVER/old_packages/cucumber-$CUCUMBER_VERSION/cucumber-$CUCARCH/
-rsync -e ssh -av /opt/old_packages/cucumber/* $STAGING_SERVER/old_packages/cucumber-$CUCUMBER_VERSION/cucumber-$CUCARCH/
+echo rsync -e ssh --delete -av /opt/old_packages/cucumber/* $STAGING_SERVER/old_packages/cucumber-$CUCUMBER_VERSION/cucumber-$CUCARCH/
+rsync -e ssh --delete -av /opt/old_packages/cucumber/* $STAGING_SERVER/old_packages/cucumber-$CUCUMBER_VERSION/cucumber-$CUCARCH/
 
