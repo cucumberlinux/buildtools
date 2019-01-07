@@ -19,7 +19,7 @@ remove_package() {
 	echo "$reason	$1" >> updates
 }
 
-find . -name "*.txz" > file-list.new
+find . -name "*.txz" | sort | sed -e 's|\./||g' > file-list.new
 sed -i file-list.new -e 's|\./||g'
 diff file-list file-list.new > updated_packages
 

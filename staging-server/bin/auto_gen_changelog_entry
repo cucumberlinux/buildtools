@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# This script automatically adds an entry to a changelog file. It does this by
+# getting the git commit history from the ports tree since the last entry in
+# the changelog and converting that to a changelog entry.
+
+if [ $# -ne 3 ]; then
+	cat >&2 << EOF
+Usage: $0 <changelog_file> <package_name> <reason>
+changelog_file MUST be at the root of a package directory.
+reason should be the reason for the package build (i.e. package built,
+	package rebuilt, package upgraded, etc).
+EOF
+	exit 1
+fi
+
+CHANGELOG=$1
+PACKAGE_NAME=$2
+REASON=$3
+
+PACKAGE_DIR=$(dirname $CHANGELOG)
+PORTS_TREE=${PORTS_TREE:-$PACKAGE_DIR/../ports}
+
+# Get the date of the last CHANGELOG entry
+LAST_DATE=$(tac $CHANGELOG | sed -n "/\/$PACKAGE_NAME-[^-]*-[^-]*-[^-]*\.t.z/,/+----------------+/p" | sed -n "0,/+----------------+/p" | tac | head -n2 | tail -n1)
+
+# Build the new CHANGELOG entry
+## Generate the package build line
+ESCAPED_NAME=$(sed 's/[^[:alnum:]]/\\&/g' <<< "$PACKAGE_NAME")
+PACKAGE_FILE=$(find "$PACKAGE_DIR" -type f | egrep '/'"$ESCAPED_NAME"'-[^-]+-[^-]+-[^-]+.t?z$')
+PACKAGE_FILE=$(sed "s#^$PACKAGE_DIR/##" <<< $PACKAGE_FILE)
+echo $PACKAGE_FILE: $REASON > /tmp/$$entry
+
+## Generate the details
+PKG_DIR=$(dirname $(find "$PORTS_TREE/" -name "$PACKAGE_NAME.buildscript"))
+OWD=$PWD
+if [ -z "$LAST_DATE" ]; then
+	# If there is no previous entry, include just the most recent commit so
+	# the entry does not get too out of control.
+	cat >> /tmp/$$entry << EOF
+This is the first build of $PACKAGE_NAME.
+Here is the most recent change to the $PACKAGE_NAME package:
+
+EOF
+	cd $PKG_DIR
+	git log -n 1 . >> /tmp/$$entry
+else
+	# If there is a previous entry, include any commits since then.
+	OLD_PACKAGE=$(egrep -o '/'"$ESCAPED_NAME"'-[^-]+-[^-]+-[^-]+.t?z' $CHANGELOG | tail -n1 | cut -d / -f 2-)
+	cd $PKG_DIR
+	cat >> /tmp/$$entry << EOF
+Here is what has changed since $OLD_PACKAGE:
+
+EOF
+	git log "--since=$LAST_DATE" . >> /tmp/$$entry
+fi
+
+# Finally, add the entry to the CHANGELOG
+cd $OWD
+cat /tmp/$$entry | $(dirname $0)/changelog $CHANGELOG || exit 1
+rm /tmp/$$entry
