@@ -5,7 +5,7 @@
 #
 #   1. Update the local copy of the ports tree.
 #   2. Update the local packages directory (in /opt/packages/cucumber).
-#   3. Build any updated packages.
+#   3. Build any updated or new packages.
 #   4. Upload the packages in /opt/packages and the old packages to the
 #      staging server.
 
@@ -20,8 +20,9 @@ portsync -r || exit 1
 $(dirname $0)/download_packages || exit 1
 $(dirname $0)/download_old_packages || exit 1
 
-# Build any updated packages.
-portmake update-all || exit 1
+# Build any updated or new packages.
+portmake update-all
+portmake install world
 
 # Upload the packages to the staging server.
 $(dirname $0)/upload_packages || exit 1
